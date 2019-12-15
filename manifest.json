@@ -1,0 +1,22 @@
+{
+    "name": "Football News",
+    "short_name": "News",
+    "description": "Information Football",
+    "start_url": "/index.html",
+    "display": "standalone",
+    "background_color": "#00897B",
+    "theme_color": "#00897B",
+    "gcm_sender_id": "244255296349",
+    "icons": [
+        {
+        "src": "icon.png",
+        "sizes": "512x512",
+        "type": "image/png"
+    },
+    {
+        "src": "icon.png",
+        "sizes": "192x192",
+        "type": "image/png"
+    }
+]
+}

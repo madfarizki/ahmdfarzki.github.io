@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+  <html lang="en">
+    <head>
+      <meta charset="UTF-8" />
+      <title>Football</title>
+      <meta name="description" content="My first PWA" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <link rel="stylesheet" href="/css/materialize.min.css" />
+      <link rel="manifest" href="/manifest.json" />
+      <meta name="theme-color" content="#0000FF" />
+      <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+    </head>
+    <body>
+      <!-- Navigasi -->
+      <nav class="teal lighten-1" role="navigation">
+        <div class="nav-wrapper container">
+          <a href="#" class="brand-logo" id="logo-container">Football News</a>
+          <a href="index.html" class="sidenav-trigger" data-target="nav-mobile">
+            <i class="material-icons">arrow_back</i>
+          </a>
+          <ul class="topnav right hide-on-med-and-down"></ul>
+          <ul class="sidenav" id="nav-mobile"></ul>
+        </div>
+      </nav>
+      <!-- Akhir Navigasi -->
+      <h4>Favorit Team</h4>
+<div class="row">
+      
+      <div class="container" id="body-content"></div>
+      
+    </div>
+  
+      <script
+        type="text/javascript"
+        src="https://unpkg.com/snarkdown@1.0.2/dist/snarkdown.umd.js"
+      ></script>
+      <script src="/js/materialize.min.js"></script>
+      <script src="/js/api.js"></script>
+      <script src="/js/idb.js"></script>
+      <script src="/js/db.js"></script>
+  
+      <script>
+        var dbPromise = idb.open("Football News", 1, function(upgradeDb) {
+    var articlesObjectStore = upgradeDb.createObjectStore("team", {
+      keyPath: "id"
+    });
+    articlesObjectStore.createIndex("team", "team", { unique: false });
+  });
+  
+  document.addEventListener("DOMContentLoaded", function () {
+            getAllTeam();
+        });
+    
+        function getAllTeam() {
+            dbPromise.then(function (db) {
+                var tx = db.transaction('team', 'readonly');
+                var store = tx.objectStore('team');
+    
+                return store.getAll();
+            }).then(function (teams) {
+                console.log('Data berhasil fetch : ', teams);
+    
+                var favoritHTML = "";
+    
+                teams.forEach(function (data) {
+                    favoritHTML += `
+                    <div class="card">
+        <table class="highlight centered">
+            <thead>
+            <tr>
+              
+              <div class="center"><img width="100" height="100" src="${data.crestUrl}"></div>
+              <h4 class="center">${data.name}</h4>
+      
+            </tr>
+
+            </thead>
+  
+            <tbody>
+                <tr>
+                  <h6 class="center">Address : ${data.address}</h6 class="center">
+                  <h6 class="center">Phone : ${data.phone}</h6 class="center">
+                  <h6 class="center">Email : ${data.email}</h6 class="center">
+                  <h6 class="center">Website : ${data.website}</h6 class="center">
+                  <h6 class="center">Founded : ${data.founded}</h6 class="center">
+                  <td><a class="waves-effect waves-light btn-small blue" onclick="hapusTeam((${data.id}))"><i class="material-icons left">delete</i>Hapus</a></td>
+                </tr>
+            </tbody>
+        </table>
+                `
+                });
+    
+                document.getElementById('body-content').innerHTML = favoritHTML;
+            }).catch(function () {
+
+            });
+        }
+    
+        function hapusTeam(id) {
+    
+            dbPromise.then(function (db) {
+              if ('PushManager' in window) {
+                    navigator.serviceWorker.getRegistration()
+                        .then(function (reg) {
+                            reg.showNotification(`Team Favorit telah dihapus`);
+                        });
+                }
+    
+                var tx = db.transaction('team', 'readwrite');
+                var store = tx.objectStore('team');
+                store.delete(id);
+                return tx.complete;
+            }).then(function () {
+                M.toast({html: 'Berhasil menghapus Team'})
+                window.location.href = "index.html";
+                console.log('Team telah dihapus');
+            }).catch(function (error) {
+                alert('gagal menghapus tim :(');
+                console.log(error);
+            });
+        }
+      </script>
+    </body>
+  </html>
